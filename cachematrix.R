@@ -6,7 +6,15 @@
 ## 1) Create a special "matrix" object that can cache its inverse.
 
 makeCacheMatrix <- function(x = matrix()) {
-
+        inv <- NULL           #create empty variable
+        set <- function(x) {
+                x <<- y       #in Global Environment
+                inv <<- NULL  #in Global Environment
+        }
+        get <- function() x
+        setinv <- function(solve) inv <<- solve  #in Global Environment
+        getinv <- function() inv
+        list(set = set, get = get, setinv = setinv, getinv=getinv)
 }
 
 
@@ -15,5 +23,16 @@ makeCacheMatrix <- function(x = matrix()) {
 ## should retrieve the inverse from the cache.
 
 cacheSolve <- function(x, ...) {
-
+        inv <- getinv()     #retrieve inverse
+        xold <- get()         #retrieve original matrix
+        if(!is.null(inv)      #check inverse cached
+           &&
+        identical(x,xold)) {  #check matrix unchanged
+                message("getting cached data")
+                return(inv)
+        }
+        data <- get()       #otherwise calculate inverse
+        inv <- solve(data, ...)
+        setinv(inv)
+        inv
 }
